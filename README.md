@@ -1,4 +1,4 @@
-# Todo App - Next.js
+# Todo App Rovodev - Next.js
 
 Une application Todo moderne et responsive construite avec Next.js, TypeScript et Tailwind CSS.
 
