@@ -1,76 +1,33 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import { Todo, TodoFilter } from './types'
+import { useState } from 'react'
+import { TodoFilter } from './types'
+import { useTodos } from './hooks/useTodos'
 import TodoInput from './components/TodoInput'
 import TodoList from './components/TodoList'
 import TodoFilters from './components/TodoFilters'
 import TodoStats from './components/TodoStats'
 
 export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>([])
   const [filter, setFilter] = useState<TodoFilter>('all')
-
-  // Load todos from localStorage on component mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedTodos = localStorage.getItem('todos')
-      if (savedTodos) {
-        try {
-          const parsedTodos = JSON.parse(savedTodos).map((todo: any) => ({
-            ...todo,
-            createdAt: new Date(todo.createdAt),
-            updatedAt: new Date(todo.updatedAt)
-          }))
-          setTodos(parsedTodos)
-        } catch (error) {
-          console.error('Error loading todos from localStorage:', error)
-        }
-      }
-    }
-  }, [])
-
-  // Save todos to localStorage whenever todos change
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('todos', JSON.stringify(todos))
-    }
-  }, [todos])
-
-  const addTodo = (text: string) => {
-    const newTodo: Todo = {
-      id: uuidv4(),
-      text: text.trim(),
-      completed: false,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-    setTodos(prev => [newTodo, ...prev])
-  }
+  const { todos, loading, error, addTodo, updateTodo, deleteTodo } = useTodos()
 
   const toggleTodo = (id: string) => {
-    setTodos(prev => prev.map(todo =>
-      todo.id === id
-        ? { ...todo, completed: !todo.completed, updatedAt: new Date() }
-        : todo
-    ))
-  }
-
-  const deleteTodo = (id: string) => {
-    setTodos(prev => prev.filter(todo => todo.id !== id))
+    const todo = todos.find(t => t.id === id)
+    if (todo) {
+      updateTodo(id, { completed: !todo.completed })
+    }
   }
 
   const editTodo = (id: string, newText: string) => {
-    setTodos(prev => prev.map(todo =>
-      todo.id === id
-        ? { ...todo, text: newText.trim(), updatedAt: new Date() }
-        : todo
-    ))
+    updateTodo(id, { text: newText.trim() })
   }
 
-  const clearCompleted = () => {
-    setTodos(prev => prev.filter(todo => !todo.completed))
+  const clearCompleted = async () => {
+    const completedTodos = todos.filter(todo => todo.completed)
+    for (const todo of completedTodos) {
+      await deleteTodo(todo.id)
+    }
   }
 
   const filteredTodos = todos.filter(todo => {
@@ -88,15 +45,36 @@ export default function Home() {
   const completedCount = todos.filter(todo => todo.completed).length
   const activeCount = todos.length - completedCount
 
+  if (loading) {
+    return (
+      <main className="container mx-auto px-4 py-8 max-w-2xl">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
+            <h1 className="text-3xl font-bold text-center">Todo App</h1>
+          </div>
+          <div className="p-6 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <p className="mt-4 text-gray-600">Chargement des tâches...</p>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="container mx-auto px-4 py-8 max-w-2xl">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
           <h1 className="text-3xl font-bold text-center">Todo App</h1>
-          <p className="text-center text-blue-100 mt-2">Organisez vos tâches efficacement</p>
         </div>
         
         <div className="p-6">
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">⚠️ {error}</p>
+            </div>
+          )}
+
           <TodoInput onAddTodo={addTodo} />
           
           <div className="mt-6">

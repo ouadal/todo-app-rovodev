@@ -14,24 +14,38 @@ Une application Todo moderne et responsive construite avec Next.js, TypeScript e
 
 ## Technologies utilisées
 
-- **Next.js 14** - Framework React
+- **Next.js 14** - Framework React avec App Router
 - **TypeScript** - Typage statique
 - **Tailwind CSS** - Framework CSS utilitaire
+- **MySQL** - Base de données relationnelle
+- **mysql2** - Connecteur MySQL pour Node.js
 - **UUID** - Génération d'identifiants uniques
 
 ## Installation et démarrage
 
-1. Installer les dépendances :
+1. **Cloner le repository :**
+```bash
+git clone https://github.com/ouadal/todo-app-rovodev.git
+cd todo-app-rovodev
+```
+
+2. **Installer les dépendances :**
 ```bash
 npm install
 ```
 
-2. Démarrer le serveur de développement :
+3. **Configurer la base de données :**
+```bash
+cp .env.example .env.local
+```
+Puis remplissez les variables dans `.env.local` (voir [DATABASE_SETUP.md](./DATABASE_SETUP.md))
+
+4. **Démarrer le serveur de développement :**
 ```bash
 npm run dev
 ```
 
-3. Ouvrir [http://localhost:3000](http://localhost:3000) dans votre navigateur
+5. **Ouvrir [http://localhost:3000](http://localhost:3000) dans votre navigateur**
 
 ## Scripts disponibles
 
