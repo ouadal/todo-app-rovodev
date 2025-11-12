@@ -1,41 +1,39 @@
-# Configuration de la base de données MySQL
+# Configuration de la base de données PostgreSQL
 
 ## Options de base de données gratuites
 
-### 1. PlanetScale (Recommandé) 🚀
+### 1. Supabase (Recommandé) 🐘
 
 **Avantages :**
-- 10GB gratuit
+- 500MB gratuit
+- Interface d'administration intégrée
 - Intégration parfaite avec Vercel
-- Pas besoin de gérer l'infrastructure
 
 **Étapes :**
-1. Créez un compte sur [planetscale.com](https://planetscale.com)
-2. Créez une nouvelle base de données
-3. Créez une branche "main"
-4. Générez un mot de passe pour la connexion
-5. Copiez les informations de connexion
+1. Créez un compte sur [supabase.com](https://supabase.com)
+2. Créez un nouveau projet
+3. Récupérez les informations de connexion depuis les paramètres du projet
 
 ### 2. Railway 🚄
 
 **Avantages :**
 - $5 de crédit gratuit par mois
-- MySQL classique
+- PostgreSQL classique
 
 **Étapes :**
 1. Créez un compte sur [railway.app](https://railway.app)
 2. Créez un nouveau projet
-3. Ajoutez un service MySQL
+3. Ajoutez un service PostgreSQL
 4. Récupérez les informations de connexion
 
-### 3. Supabase (PostgreSQL) 🐘
+### 3. Neon 🟢
 
 **Avantages :**
-- 500MB gratuit
-- Interface d'administration intégrée
+- 512MB gratuit
+- Serverless PostgreSQL
 
 **Étapes :**
-1. Créez un compte sur [supabase.com](https://supabase.com)
+1. Créez un compte sur [neon.tech](https://neon.tech)
 2. Créez un nouveau projet
 3. Récupérez les informations de connexion
 
@@ -48,20 +46,31 @@ cp .env.example .env.local
 
 ### 2. Remplissez les variables d'environnement
 
-**Pour PlanetScale :**
+**Pour Supabase :**
 ```env
-DATABASE_HOST=aws.connect.psdb.cloud
-DATABASE_USERNAME=votre-username
-DATABASE_PASSWORD=pscale_pw_xxxxxxxxxxxx
-DATABASE_NAME=votre-database-name
+PGHOST=votre-host.supabase.co
+PGUSER=postgres
+PGPASSWORD=votre-password
+PGDATABASE=postgres
+PGPORT=5432
 ```
 
 **Pour Railway :**
 ```env
-DATABASE_HOST=containers-us-west-xx.railway.app
-DATABASE_USERNAME=root
-DATABASE_PASSWORD=votre-password
-DATABASE_NAME=railway
+PGHOST=containers-us-west-xx.railway.app
+PGUSER=postgres
+PGPASSWORD=votre-password
+PGDATABASE=railway
+PGPORT=5432
+```
+
+**Pour Neon :**
+```env
+PGHOST=ep-xxxxxxx-xxxxx.us-east-1.aws.neon.tech
+PGUSER=votre-username
+PGPASSWORD=votre-password
+PGDATABASE=neondb
+PGPORT=5432
 ```
 
 ### 3. Installez les dépendances
@@ -78,11 +87,12 @@ npm run dev
 
 1. Allez dans les paramètres de votre projet Vercel
 2. Section "Environment Variables"
-3. Ajoutez les 4 variables :
-   - `DATABASE_HOST`
-   - `DATABASE_USERNAME`
-   - `DATABASE_PASSWORD`
-   - `DATABASE_NAME`
+3. Ajoutez les variables PostgreSQL :
+   - `PGHOST`
+   - `PGUSER`
+   - `PGPASSWORD`
+   - `PGDATABASE`
+   - `PGPORT` (optionnel, défaut 5432)
 
 4. Redéployez votre application
 
