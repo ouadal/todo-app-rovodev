@@ -1,28 +1,43 @@
-import mysql from 'mysql2/promise'
+import { Pool } from 'pg'
 
-let connection: mysql.Connection | null = null
-
-async function getConnection(): Promise<mysql.Connection> {
-  if (!connection) {
-    connection = await mysql.createConnection({
-      host: process.env.DATABASE_HOST || 'localhost',
-      user: process.env.DATABASE_USER || 'root',
-      password: process.env.DATABASE_PASSWORD || '',
-      database: process.env.DATABASE_NAME || 'todo_app',
-      port: parseInt(process.env.DATABASE_PORT || '3306')
-    })
-  }
-  return connection
-}
+const pool = new Pool({
+  host: process.env.PGHOST || 'localhost',
+  user: process.env.PGUSER || 'postgres',
+  password: process.env.PGPASSWORD || '',
+  database: process.env.PGDATABASE || 'todo_app',
+  port: parseInt(process.env.PGPORT || '5432'),
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+})
 
 export async function query(sql: string, params?: any[]) {
   try {
-    console.log('MySQL Query:', sql, params)
-    const conn = await getConnection()
-    const [results] = await conn.execute(sql, params)
-    return results
+    console.log('PostgreSQL Query:', sql, params)
+    const result = await pool.query(sql, params)
+    return result.rows
   } catch (error) {
-    console.error('Erreur MySQL:', error)
+    console.error('Erreur PostgreSQL:', error)
+    throw error
+  }
+}
+
+export async function queryOne(sql: string, params?: any[]) {
+  try {
+    console.log('PostgreSQL Query One:', sql, params)
+    const result = await pool.query(sql, params)
+    return result.rows[0] || null
+  } catch (error) {
+    console.error('Erreur PostgreSQL:', error)
+    throw error
+  }
+}
+
+export async function execute(sql: string, params?: any[]) {
+  try {
+    console.log('PostgreSQL Execute:', sql, params)
+    const result = await pool.query(sql, params)
+    return { changes: result.rowCount }
+  } catch (error) {
+    console.error('Erreur PostgreSQL:', error)
     throw error
   }
 }
@@ -34,7 +49,7 @@ export async function initDatabase() {
       text TEXT NOT NULL,
       completed BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `
 
@@ -45,3 +60,6 @@ export async function initDatabase() {
     console.error('Erreur lors de la création de la table:', error)
   }
 }
+
+// Initialize database on module load
+initDatabase()
