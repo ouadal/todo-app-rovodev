@@ -1,113 +1,33 @@
-# Configuration de la base de données PostgreSQL
-
-## Options de base de données gratuites
-
-### 1. Supabase (Recommandé) 🐘
-
-**Avantages :**
-- 500MB gratuit
-- Interface d'administration intégrée
-- Intégration parfaite avec Vercel
-
-**Étapes :**
-1. Créez un compte sur [supabase.com](https://supabase.com)
-2. Créez un nouveau projet
-3. Récupérez les informations de connexion depuis les paramètres du projet
-
-### 2. Railway 🚄
-
-**Avantages :**
-- $5 de crédit gratuit par mois
-- PostgreSQL classique
-
-**Étapes :**
-1. Créez un compte sur [railway.app](https://railway.app)
-2. Créez un nouveau projet
-3. Ajoutez un service PostgreSQL
-4. Récupérez les informations de connexion
-
-### 3. Neon 🟢
-
-**Avantages :**
-- 512MB gratuit
-- Serverless PostgreSQL
-
-**Étapes :**
-1. Créez un compte sur [neon.tech](https://neon.tech)
-2. Créez un nouveau projet
-3. Récupérez les informations de connexion
+# Configuration de la base de données SQLite
 
 ## Configuration locale
 
-### 1. Copiez le fichier d'environnement
-```bash
-cp .env.example .env.local
-```
+SQLite est utilisé pour le développement local. La base de données est stockée dans le fichier `todo.db` à la racine du projet.
 
-### 2. Remplissez les variables d'environnement
-
-**Pour Supabase :**
-```env
-PGHOST=votre-host.supabase.co
-PGUSER=postgres
-PGPASSWORD=votre-password
-PGDATABASE=postgres
-PGPORT=5432
-```
-
-**Pour Railway :**
-```env
-PGHOST=containers-us-west-xx.railway.app
-PGUSER=postgres
-PGPASSWORD=votre-password
-PGDATABASE=railway
-PGPORT=5432
-```
-
-**Pour Neon :**
-```env
-PGHOST=ep-xxxxxxx-xxxxx.us-east-1.aws.neon.tech
-PGUSER=votre-username
-PGPASSWORD=votre-password
-PGDATABASE=neondb
-PGPORT=5432
-```
-
-### 3. Installez les dépendances
+### Installation des dépendances
 ```bash
 npm install
 ```
 
-### 4. Testez la connexion
+### Démarrage de l'application
 ```bash
 npm run dev
 ```
 
-## Configuration sur Vercel
-
-1. Allez dans les paramètres de votre projet Vercel
-2. Section "Environment Variables"
-3. Ajoutez les variables PostgreSQL :
-   - `PGHOST`
-   - `PGUSER`
-   - `PGPASSWORD`
-   - `PGDATABASE`
-   - `PGPORT` (optionnel, défaut 5432)
-
-4. Redéployez votre application
+La base de données SQLite sera créée automatiquement avec la table `todos` lors du premier accès.
 
 ## Structure de la table
 
-La table `todos` sera créée automatiquement avec cette structure :
+La table `todos` est créée automatiquement avec cette structure :
 
 ```sql
-CREATE TABLE todos (
-  id VARCHAR(36) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS todos (
+  id TEXT PRIMARY KEY,
   text TEXT NOT NULL,
   completed BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)
 ```
 
 ## Endpoints API disponibles
@@ -117,13 +37,18 @@ CREATE TABLE todos (
 - `PUT /api/todos/[id]` - Mettre à jour une todo
 - `DELETE /api/todos/[id]` - Supprimer une todo
 
-## Troubleshooting
+## Avantages de SQLite pour le développement
 
-### Erreur de connexion SSL
-Si vous avez une erreur SSL, vérifiez que votre provider supporte SSL.
+- Pas besoin de serveur de base de données séparé
+- Base de données fichier simple et portable
+- Configuration minimale
+- Performance excellente pour les applications locales
+- Pas de dépendances externes pour le développement
 
-### Timeout de connexion
-Vérifiez que les informations de connexion sont correctes.
+## Fichiers de base de données
 
-### Table non trouvée
-La table est créée automatiquement au premier accès. Vérifiez les logs de l'API.
+- `todo.db` - Fichier principal de la base de données
+- `todo.db-wal` - Write-Ahead Logging file (pour les performances)
+- `todo.db-shm` - Shared memory file (pour les connexions multiples)
+
+Ces fichiers sont automatiquement gérés par SQLite et ne nécessitent pas d'attention particulière.
