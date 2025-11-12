@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { query, queryOne, execute } from '@/lib/db-sqlite'
+import { query, queryOne, execute } from '@/lib/db'
 
 // PUT - Mettre à jour une todo
 export async function PUT(
