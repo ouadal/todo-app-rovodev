@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { query, queryOne, execute } from '@/lib/db-sqlite'
+import { query, queryOne, execute } from '@/lib/db'
 
 // PUT - Mettre à jour une todo
 export async function PUT(
@@ -41,13 +41,13 @@ export async function PUT(
     values.push(new Date().toISOString())
     values.push(id)
 
-    execute(
+    await execute(
       `UPDATE todos SET ${updateFields.join(', ')} WHERE id = ?`,
       values
     )
 
     // Récupérer la todo mise à jour
-    const updatedTodo = queryOne('SELECT * FROM todos WHERE id = ?', [id])
+    const updatedTodo = await queryOne('SELECT * FROM todos WHERE id = ?', [id])
 
     if (!updatedTodo) {
       return NextResponse.json(
@@ -81,7 +81,7 @@ export async function DELETE(
       )
     }
 
-    const result = execute('DELETE FROM todos WHERE id = ?', [id])
+    const result = await execute('DELETE FROM todos WHERE id = ?', [id])
 
     if (result.changes === 0) {
       return NextResponse.json(
